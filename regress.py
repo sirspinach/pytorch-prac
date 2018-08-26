@@ -2,7 +2,7 @@ import torch, torchvision
 import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 from matplotlib import pyplot as plt
 import numpy as np
 import sklearn.preprocessing as pre
@@ -20,9 +20,9 @@ def data_from_xls(filename, test_proportion=.1):
         proportion of data to reserve for testing.
 
     Returns:
-    train_set (Dataset) -- The normalized training data, as a list of
+    train_set (TensorDataset) -- The normalized training data, as
         (input, output) pairs.
-    test_set (Dataset) -- The normalized testing data, as a list of
+    test_set (TensorDataset) -- The normalized testing data, as
         (input, output) pairs.
     scaler_x (sklearn.preprocessing.StandardScale) -- The scaling transform
         fitted to the training inputs. Can be used to unscale inputs.
@@ -43,7 +43,7 @@ def data_from_xls(filename, test_proportion=.1):
     test_X = torch.from_numpy(scaler_X.transform(test_X))
     test_Y = torch.from_numpy(scaler_Y.transform(test_Y))
 
-    return list(zip(train_X, train_Y)), list(zip(test_X, test_Y)), \
+    return TensorDataset(train_X, train_Y), TensorDataset(test_X, test_Y), \
             scaler_X, scaler_Y
 
 train_set, test_set, scaler_x, scaler_y = data_from_xls(

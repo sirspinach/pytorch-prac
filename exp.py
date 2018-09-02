@@ -8,7 +8,6 @@ ff = nn.Sequential(nn.Linear(1, K), nn.LeakyReLU(K), nn.Linear(K, K),
         nn.LeakyReLU(K), nn.Linear(K, 1))
 
 def init_weights(m):
-    return
     if type(m) is nn.Linear:
         torch.nn.init.kaiming_normal_(m.weight, 0.01)
 ff.apply(init_weights)

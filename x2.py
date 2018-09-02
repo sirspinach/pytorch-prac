@@ -3,28 +3,20 @@ from torch import nn
 from collections import OrderedDict
 
 
-K = 6
-ff = nn.Sequential(nn.Linear(1, K), nn.LeakyReLU(K), nn.Linear(K, K),
-        nn.LeakyReLU(K), nn.Linear(K, 1))
+def train_on_x2(net, optim=None, verbose=True, epochs=5000):
+    N = 2000
+    X = torch.randn(N, 1)
+    Y = X**2
 
-def init_weights(m):
-    return
-    if type(m) is nn.Linear:
-        torch.nn.init.kaiming_normal_(m.weight, 0.01)
-ff.apply(init_weights)
-
-N = 2000
-X = torch.randn(N, 1)
-Y = X**2
-
-optimizer = torch.optim.SGD(ff.parameters(), 0.003, momentum=0.3)
-loss_fn = nn.MSELoss()
-for i in range(5000):
-    optimizer.zero_grad()
-    loss = loss_fn(ff.forward(X), Y)
-    loss.backward()
-    optimizer.step()
-    print("MSE Error: {:.4f}".format(loss))
+    optimizer = optim or torch.optim.SGD(net.parameters(), 0.003, momentum=0.3)
+    loss_fn = nn.MSELoss()
+    for i in range(epochs):
+        optimizer.zero_grad()
+        loss = loss_fn(net.forward(X), Y)
+        loss.backward()
+        optimizer.step()
+        if verbose:
+            print("MSE Error: {:.4f}".format(loss))
 
 # Now plot our predictions
 @torch.no_grad()
@@ -38,4 +30,14 @@ def visualize():
     plt.scatter(X_test.numpy(), X_test.numpy()**2, s=4, label="actual")
     plt.legend()
     plt.show()
-visualize()
+
+if __name__ == '__main__':
+    K = 6
+    ff = nn.Sequential(nn.Linear(1, K), nn.LeakyReLU(K), nn.Linear(K, K),
+            nn.LeakyReLU(K), nn.Linear(K, 1))
+
+    def init_weights(m):
+        if type(m) is nn.Linear:
+            torch.nn.init.kaiming_normal_(m.weight, 0.01)
+    ff.apply(init_weights)
+    visualize()
